@@ -3,8 +3,9 @@ import { IoEye, IoEyeOff } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-//import { PiUserCircle } from "react-icons/pi";
 import Avatar from "../components/Avatar";
+import { useDispatch } from "react-redux";
+import { setToken } from "../redux/userSlice";
 
 const CheckPassword = () => {
   const [data, setData] = useState({
@@ -13,8 +14,7 @@ const CheckPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
-
-  console.log("location", location.state);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!location?.state?.name) {
@@ -24,13 +24,10 @@ const CheckPassword = () => {
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-
-    setData((previous) => {
-      return {
-        ...previous,
-        [name]: value,
-      };
-    });
+    setData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -39,26 +36,27 @@ const CheckPassword = () => {
 
     const URL = `${process.env.REACT_APP_BACKEND_URL}/api/password`;
 
-  
     try {
       const response = await axios({
-        method :'post',
-        url : URL,
-        data : {
-          userId : location?.state?._id,
-          password : data.password
+        method: 'post',
+        url: URL,
+        data: {
+          userId: location?.state?._id,
+          password: data.password
         },
-        withCredentials : true
-      })
+        withCredentials: true
+      });
 
       toast.success(response.data.message);
 
       if (response.data.success) {
+        dispatch(setToken(response?.data?.token));
+        localStorage.setItem('token', response?.data?.token);
+
         setData({
           password: "",
         });
         navigate('/');
-        
       }
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -68,15 +66,12 @@ const CheckPassword = () => {
   return (
     <div className="mt-5">
       <div className="bg-white w-full max-w-md rounded overflow-hidden p-4 mx-auto">
-        <div className="w-fit mx-auto mb-2">
-          {/* <PiUserCircle
-                  size={80}
-  /> */}
-          <Avatar 
-          width={80}
-          height={80}
-          name={location.state?.name}
-          imageURL={location?.state?.profile_pic}
+        <div className="flex justify-center mb-2">
+          <Avatar
+            width={80}
+            height={80}
+            name={location?.state?.name}
+            imageURL={location?.state?.profile_pic}
           />
         </div>
 
@@ -87,23 +82,22 @@ const CheckPassword = () => {
         <form className="grid gap-4 mt-3" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1 relative">
             <label htmlFor="password">Password</label>
-            <div className='relative'>
+            <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'} // Toggle between 'text' and 'password'
-                id='password'
-                name='password'
-                placeholder='enter your password'
-                className='bg-slate-100 px-2 py-1 focus:outline-primary w-full'
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                placeholder="enter your password"
+                className="bg-slate-100 px-2 py-1 focus:outline-primary w-full"
                 value={data.password}
                 onChange={handleOnChange}
                 required
-                autoComplete='current-password'
+                autoComplete="current-password"
               />
               <button
-                type='button'
-                className='absolute right-2 top-1/2 transform -translate-y-1/2'
+                type="button"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
                 onClick={() => setShowPassword((prev) => !prev)}
-                
               >
                 {showPassword ? <IoEye /> : <IoEyeOff />}
               </button>
@@ -116,9 +110,8 @@ const CheckPassword = () => {
         </form>
 
         <p className="my-3 text-center">
-          
           <Link to={"/forgot-password"} className="hover:text-primary font-semibold">
-          Forgot your Password?
+            Forgot your Password?
           </Link>
         </p>
       </div>

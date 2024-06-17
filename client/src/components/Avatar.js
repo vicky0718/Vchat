@@ -1,17 +1,15 @@
 import React from 'react'
 import { PiUserCircle } from "react-icons/pi";
 
-const Avatar = ({userId, name, imageURL, width, height}) => {
-
+const Avatar = ({ userId, name, imageURL, width, height, color }) => {
     let avatarName = ""
 
-    if(name){
-        const splitName = name?.split(" ")
+    if (name) {
+        const splitName = name.split(" ")
 
-        if(splitName.length > 1){
-            avatarName = splitName[0][0] +splitName[1][0]
-        }
-        else{
+        if (splitName.length > 1) {
+            avatarName = splitName[0][0] + splitName[1][0]
+        } else {
             avatarName = splitName[0][0]
         }
     }
@@ -25,36 +23,34 @@ const Avatar = ({userId, name, imageURL, width, height}) => {
         'bg-cyan-200',
         'bg-rose-200',
         'bg-indigo-600',
-
     ]
 
-    const randomNum = Math.floor(Math.random() * 9)
-    console.log(randomNum)
+    const randomNum = Math.floor(Math.random() * bgColor.length)
 
-  return (
-    <div className={`text-slate-800 overflow-hidden rounded-full  font-semibold `} style={{width: width+"px", height: height+"px"}}>
-      {
-        imageURL ? (
-            <img src={imageURL}
-            width={width}
-            height={height}
-            alt={name}
-            className='overflow-hidden rounded-full'
-            />
-        ) : (
-            name ? (
-                <div style={{width: width+"px", height: height+"px"}} className={`overflow-hidden rounded-full flex justify-center items-center text-3xl ${bgColor[randomNum]}`}>
-                    {avatarName}
-                </div>  
-            ) : (
-                <PiUserCircle
-                  size={width}
+    return (
+        <div
+            className={`relative rounded-full font-semibold overflow-hidden ${!imageURL && name ? bgColor[randomNum] : ''} flex items-center justify-center`}
+            style={{ width: `${width}px`, height: `${height}px` }}
+        >
+            {imageURL ? (
+                <img
+                    src={imageURL}
+                    alt={name}
+                    className='w-full h-full object-cover'
+                    style={{ width: `${width}px`, height: `${height}px` }}
                 />
-            )
-        )
-      }
-    </div>
-  )
+            ) : name ? (
+                <div
+                    className={`flex items-center justify-center text-lg text-slate-800`}
+                    style={{ width: `${width}px`, height: `${height}px` }}
+                >
+                    {avatarName}
+                </div>
+            ) : (
+                <PiUserCircle size={width} className="text-slate-800" />
+            )}
+        </div>
+    )
 }
 
 export default Avatar

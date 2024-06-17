@@ -9,6 +9,10 @@ module.exports = {
         primary: "#003d80",
         secondary: "#003269",
         button: "#0855a8"
+      },
+      opacity: {
+        '15': '0.15',
+        '85': '0.85',
       }
     },
   },
