@@ -12,9 +12,18 @@ const messageSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    audioURL: {
+        type: String,
+        default: ""
+    },
     seen: {
         type: Boolean,
         default: false
+    },
+    msgByUserId : {
+        type: mongoose.Schema.ObjectId,
+            required: true,
+            ref: 'User'  
     }
 },{
     timestamps: true
