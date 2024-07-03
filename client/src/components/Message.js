@@ -2,17 +2,17 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "./Avatar";
+import uploadFile from "../helpers/uploadFile";
+import Loading from './Loading';
 import { HiDotsVertical, HiMicrophone } from "react-icons/hi";
 import { FaAngleLeft, FaPlus, FaImage, FaVideo, FaSquarePollHorizontal } from "react-icons/fa6";
-import uploadFile from "../helpers/uploadFile";
 import { IoClose, IoCamera, IoDocument, IoSend } from "react-icons/io5";
-import { RiContactsBook3Fill, RiEmotionFill } from "react-icons/ri";
-import Loading from './Loading';
-import backgroundImage from '../assets/bg-image-dark.png';
+import { RiContactsBook3Fill, RiEmotionFill, RiDeleteBin6Line } from "react-icons/ri";
+import { ImBlocked } from "react-icons/im";
 import moment from 'moment';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { useReactMediaRecorder } from "react-media-recorder";
+import backgroundImage from '../assets/bg-image-dark.png';
 
 const Message = () => {
   const params = useParams();
@@ -26,7 +26,7 @@ const Message = () => {
     online: false,
   });
 
-  const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
+  const [openFilesUpload, setOpenFilesUpload] = useState(false);
   const [message, setMessage] = useState({
     text: "",
     imageURL: "",
@@ -36,6 +36,7 @@ const Message = () => {
   const [loading, setLoading] = useState(false);
   const [allMessage, setAllMessage] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const currentMessage = useRef(null);
 
@@ -45,8 +46,8 @@ const Message = () => {
     }
   }, [allMessage]);
 
-  const handleUploadImageVideoOpen = () => {
-    setOpenImageVideoUpload(prev => !prev);
+  const handleUploadFilesOpen = () => {
+    setOpenFilesUpload(prev => !prev);
     setIsRotated(prev => !prev);
   };
 
@@ -136,8 +137,22 @@ const Message = () => {
     }));
   };
 
+  const toggleDropdown = () => {
+    setShowDropdown(prev => !prev);
+  };
+
+  const handleDeleteChat = () => {
+    console.log("Delete chat clicked");
+    // Add your delete chat logic here
+  };
+
+  const handleBlockUser = () => {
+    console.log("Block user clicked");
+    // Add your block user logic here
+  };
+
   return (
-    <div style={{ backgroundImage: `url(${backgroundImage})` }}>
+    <div style={{ backgroundImage: `url(${backgroundImage})`}} >
       <header className="sticky top-0 h-16 bg-slate-900 flex justify-between items-center px-4 rounded-lg m-1">
         <div className="flex items-center gap-4">
           <Link to={"/"} className="lg:hidden flex items-center text-slate-500">
@@ -163,10 +178,29 @@ const Message = () => {
             </p>
           </div>
         </div>
-        <div>
-          <button className="cursor-pointer text-slate-500 hover:text-slate-300 flex items-center">
+        <div className="relative">
+          <button onClick={toggleDropdown} 
+          className="cursor-pointer text-slate-500 hover:text-slate-300 flex items-center">
             <HiDotsVertical size={25} />
           </button>
+          {showDropdown && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+              <button
+                onClick={handleDeleteChat}
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <RiDeleteBin6Line className="mr-2" />
+                Delete Chat
+              </button>
+              <button
+                onClick={handleBlockUser}
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <ImBlocked className="mr-2" />
+                Block User
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -176,7 +210,7 @@ const Message = () => {
         <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
           {
             allMessage.map((msg, index) => (
-              <div className={`p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${user._id === msg?.msgByUserId ? "ml-auto bg-gray-500" : "bg-gray-500"}`} key={index}>
+              <div className={`p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${user._id === msg?.msgByUserId ? "ml-auto bg-green-800" : "bg-gray-500"}`} key={index}>
                 <div className='w-full relative'>
                   {msg?.imageURL && (
                     <img src={msg?.imageURL} className='w-full h-full object-scale-down' alt="Uploaded" />
@@ -210,17 +244,10 @@ const Message = () => {
                   src={message.videoURL}
                   controls
                   autoPlay
-                  muted
-                  className="aspect-video w-full h-full max-w-sm m-2 object-scale-down rounded-lg"
+                  className="aspect-auto w-full h-full max-w-sm m-2 object-scale-down rounded-lg"
                 />
               )}
             </div>
-          </div>
-        )}
-        
-        {loading && (
-          <div className="w-full h-full flex justify-center items-center">
-            <Loading />
           </div>
         )}
       </section>
@@ -235,14 +262,14 @@ const Message = () => {
               {showEmojiPicker ? <IoClose size={22} /> : <RiEmotionFill size={22} />}
             </button>
             <button
-              onClick={handleUploadImageVideoOpen}
+              onClick={handleUploadFilesOpen}
               className={`flex items-center justify-start w-12 h-12 pl-3 rounded-full text-lime-700 hover:bg-primary hover:text-white transition-transform duration-300 ${isRotated ? "rotate-180" : ""}`}
             >
               <FaPlus size={22} />
             </button>
           </div>
 
-          {openImageVideoUpload && (
+          {openFilesUpload && (
             <div className="bg-slate-600 shadow rounded absolute bottom-16 w-36 p-2">
               <form>
                 <label htmlFor="uploadDocument" className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 rounded cursor-pointer">

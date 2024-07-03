@@ -18,42 +18,44 @@ const Sidebar = () => {
   const [editUserOpen, setEditUserOpen] = useState(false);
   const [allUser, setAllUser] = useState([]);
   const [openSearchUser, setOpenSearchUser] = useState(false);
-  const socketConnection = useSelector((state => state?.user?.socketConnection))
+  const socketConnection = useSelector(
+    (state) => state?.user?.socketConnection
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
 
-  useEffect(()=>{
-    if(socketConnection){
-        socketConnection.emit('sidebar',user._id)
-        
-        socketConnection.on('conversation',(data)=>{
-            console.log('conversation',data)
-            
-            const conversationUserData = data.map((conversationUser,index)=>{
-                if(conversationUser?.sender?._id === conversationUser?.receiver?._id){
-                    return{
-                        ...conversationUser,
-                        userDetails : conversationUser?.sender
-                    }
-                }
-                else if(conversationUser?.receiver?._id !== user?._id){
-                    return{
-                        ...conversationUser,
-                        userDetails : conversationUser.receiver
-                    }
-                }else{
-                    return{
-                        ...conversationUser,
-                        userDetails : conversationUser.sender
-                    }
-                }
-            })
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection.emit("sidebar", user._id);
 
-            setAllUser(conversationUserData)
-        })
+      socketConnection.on("conversation", (data) => {
+        console.log("conversation", data);
+
+        const conversationUserData = data.map((conversationUser, index) => {
+          if (
+            conversationUser?.sender?._id === conversationUser?.receiver?._id
+          ) {
+            return {
+              ...conversationUser,
+              userDetails: conversationUser?.sender,
+            };
+          } else if (conversationUser?.receiver?._id !== user?._id) {
+            return {
+              ...conversationUser,
+              userDetails: conversationUser.receiver,
+            };
+          } else {
+            return {
+              ...conversationUser,
+              userDetails: conversationUser.sender,
+            };
+          }
+        });
+
+        setAllUser(conversationUserData);
+      });
     }
-},[socketConnection,user])
+  }, [socketConnection, user]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -86,22 +88,21 @@ const Sidebar = () => {
         </div>
 
         <div className="flex flex-col items-center">
-          
           <button
             className="mx-auto my-1"
             title={user?.name}
             onClick={() => setEditUserOpen(true)}
           >
             <Avatar
-                width={40}
-                height={40}
-                name={user.name}
-                imageURL={user?.profile_pic}
-                userId={user._id} // Make sure userId is passed
-              />
+              width={40}
+              height={40}
+              name={user.name}
+              imageURL={user?.profile_pic}
+              userId={user._id} // Make sure userId is passed
+            />
           </button>
           <button className="w-12 h-12 flex justify-center items-center cursor-pointer hover:bg-slate-200 rounded">
-            <IoSettingsOutline size={25}/>
+            <IoSettingsOutline size={25} />
           </button>
           <button
             title="logout"
@@ -116,10 +117,10 @@ const Sidebar = () => {
       </div>
 
       <div className="w-full">
-      <h2 className="text-xl font-bold p-4 text-slate-200 bg-slate-800 rounded-md m-1 mb-2">
-        Messages
-      </h2>
-      <Divider/>
+        <h2 className="text-xl font-bold p-4 text-slate-200 bg-slate-800 rounded-md m-1 mb-2">
+          Messages
+        </h2>
+        <Divider />
 
         <div className=" h-[calc(100vh-65px)] overflow-x-hidden overflow-y-auto scrollbar ">
           {allUser.length === 0 && (
@@ -132,52 +133,57 @@ const Sidebar = () => {
               </p>
             </div>
           )}
-          {
-                        allUser.map((conv,index)=>{
-                            return(
-                                <NavLink to={"/"+conv?.userDetails?._id} key={conv?._id} className='flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded-lg hover:bg-slate-700 cursor-pointer'>
-                                    <div>
-                                        <Avatar
-                                            imageURL={conv?.userDetails?.profile_pic}
-                                            name={conv?.userDetails?.name}
-                                            width={40}
-                                            height={40}
-                                        />    
-                                    </div>
-                                    <div>
-                                        <h3 className='text-slate-200 text-ellipsis line-clamp-1 font-semibold text-base'>{conv?.userDetails?.name}</h3>
-                                        <div className='text-green-500 text-xs flex items-center gap-1'>
-                                            <div className='flex items-center gap-1'>
-                                                {
-                                                    conv?.lastMsg?.imageUrl && (
-                                                        <div className='flex items-center gap-1'>
-                                                            <span><FaImage/></span>
-                                                            {!conv?.lastMsg?.text && <span>Image</span>  } 
-                                                        </div>
-                                                    )
-                                                }
-                                                {
-                                                    conv?.lastMsg?.videoUrl && (
-                                                        <div className='flex items-center gap-1'>
-                                                            <span><FaVideo/></span>
-                                                            {!conv?.lastMsg?.text && <span>Video</span>}
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
-                                            <p className='text-ellipsis line-clamp-1'>{conv?.lastMsg?.text}</p>
-                                        </div>
-                                    </div>
-                                    {
-                                        Boolean(conv?.unseenMsg) && (
-                                            <p className='text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-primary text-white font-semibold rounded-full'>{conv?.unseenMsg}</p>
-                                        )
-                                    }
-
-                                </NavLink>
-                            )
-                        })
-                    }
+          {allUser.map((conv, index) => {
+            return (
+              <NavLink
+                to={"/" + conv?.userDetails?._id}
+                key={conv?._id}
+                className="flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded-lg hover:bg-slate-700 cursor-pointer"
+              >
+                <div>
+                  <Avatar
+                    imageURL={conv?.userDetails?.profile_pic}
+                    name={conv?.userDetails?.name}
+                    width={40}
+                    height={40}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-slate-200 text-ellipsis line-clamp-1 font-semibold text-base">
+                    {conv?.userDetails?.name}
+                  </h3>
+                  <div className="text-green-500 text-xs flex items-center gap-1">
+                    <div className="flex items-center gap-1">
+                      {conv?.lastMsg?.imageURL && (
+                        <div className="flex items-center gap-1">
+                          <span>
+                            <FaImage />
+                          </span>
+                          {!conv?.lastMsg?.text && <span>Image</span>}
+                        </div>
+                      )}
+                      {conv?.lastMsg?.videoURL && (
+                        <div className="flex items-center gap-1">
+                          <span>
+                            <FaVideo />
+                          </span>
+                          {!conv?.lastMsg?.text && <span>Video</span>}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-ellipsis line-clamp-1">
+                      {conv?.lastMsg?.text}
+                    </p>
+                  </div>
+                </div>
+                {Boolean(conv?.unseenMsg) && (
+                  <p className="text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-primary text-white font-semibold rounded-full">
+                    {conv?.unseenMsg}
+                  </p>
+                )}
+              </NavLink>
+            );
+          })}
         </div>
       </div>
 

@@ -41,6 +41,7 @@ const CheckEmail = () => {
             })
         }
     } catch (error) {
+      console.error('Error checking email:', error.response ? error.response.data : error.message);
         toast.error(error?.response?.data?.message)
     }
   }
