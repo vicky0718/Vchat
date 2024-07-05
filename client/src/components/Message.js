@@ -3,21 +3,33 @@ import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "./Avatar";
 import uploadFile from "../helpers/uploadFile";
-import Loading from './Loading';
+import Loading from "./Loading";
 import { HiDotsVertical, HiMicrophone } from "react-icons/hi";
-import { FaAngleLeft, FaPlus, FaImage, FaVideo, FaSquarePollHorizontal } from "react-icons/fa6";
+import {
+  FaAngleLeft,
+  FaPlus,
+  FaImage,
+  FaVideo,
+  FaSquarePollHorizontal,
+} from "react-icons/fa6";
 import { IoClose, IoCamera, IoDocument, IoSend } from "react-icons/io5";
-import { RiContactsBook3Fill, RiEmotionFill, RiDeleteBin6Line } from "react-icons/ri";
+import {
+  RiContactsBook3Fill,
+  RiEmotionFill,
+  RiDeleteBin6Line,
+} from "react-icons/ri";
 import { ImBlocked } from "react-icons/im";
-import moment from 'moment';
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
-import backgroundImage from '../assets/bg-image-dark.png';
+import moment from "moment";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
+import backgroundImage from "../assets/bg-image-dark.png";
 
 const Message = () => {
   const params = useParams();
-  const socketConnection = useSelector((state) => state?.user?.socketConnection);
-  const user = useSelector(state => state?.user);
+  const socketConnection = useSelector(
+    (state) => state?.user?.socketConnection
+  );
+  const user = useSelector((state) => state?.user);
 
   const [dataUser, setDataUser] = useState({
     name: "",
@@ -42,13 +54,16 @@ const Message = () => {
 
   useEffect(() => {
     if (currentMessage.current) {
-      currentMessage.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      currentMessage.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
     }
   }, [allMessage]);
 
   const handleUploadFilesOpen = () => {
-    setOpenFilesUpload(prev => !prev);
-    setIsRotated(prev => !prev);
+    setOpenFilesUpload((prev) => !prev);
+    setIsRotated((prev) => !prev);
   };
 
   const handleUploadImage = async (e) => {
@@ -56,7 +71,7 @@ const Message = () => {
     setLoading(true);
     const uploadPhoto = await uploadFile(file);
     setLoading(false);
-    setMessage(prev => ({
+    setMessage((prev) => ({
       ...prev,
       imageURL: uploadPhoto.url,
     }));
@@ -67,14 +82,14 @@ const Message = () => {
     setLoading(true);
     const uploadVideo = await uploadFile(file);
     setLoading(false);
-    setMessage(prev => ({
+    setMessage((prev) => ({
       ...prev,
       videoURL: uploadVideo.url,
     }));
   };
 
   const handleClearUpload = () => {
-    setMessage(prev => ({
+    setMessage((prev) => ({
       ...prev,
       imageURL: "",
       videoURL: "",
@@ -85,13 +100,13 @@ const Message = () => {
     e.preventDefault();
     if (message.text || message.imageURL || message.videoURL) {
       if (socketConnection) {
-        socketConnection.emit('new message', {
+        socketConnection.emit("new message", {
           sender: user?._id,
           receiver: params.userId,
           text: message.text,
           imageURL: message.imageURL,
           videoURL: message.videoURL,
-          msgByUserId: user._id
+          msgByUserId: user._id,
         });
         setMessage({
           text: "",
@@ -104,41 +119,41 @@ const Message = () => {
 
   useEffect(() => {
     if (socketConnection) {
-      socketConnection.emit('message-page', params.userId);
-      socketConnection.emit('seen', params.userId);
+      socketConnection.emit("message-page", params.userId);
+      socketConnection.emit("seen", params.userId);
 
-      socketConnection.on('message-user', (data) => {
+      socketConnection.on("message-user", (data) => {
         setDataUser(data);
       });
 
-      socketConnection.on('message', (data) => {
-        console.log('message data', data);
-        setAllMessage(data)
+      socketConnection.on("message", (data) => {
+        console.log("message data", data);
+        setAllMessage(data);
       });
     }
   }, [socketConnection, params?.userId, user]);
 
   const handleOnChange = (e) => {
     const { value } = e.target;
-    setMessage(prev => ({
+    setMessage((prev) => ({
       ...prev,
       text: value,
     }));
   };
 
   const toggleEmojiPicker = () => {
-    setShowEmojiPicker(prev => !prev);
+    setShowEmojiPicker((prev) => !prev);
   };
 
   const addEmoji = (emoji) => {
-    setMessage(prev => ({
+    setMessage((prev) => ({
       ...prev,
       text: prev.text + emoji.native,
     }));
   };
 
   const toggleDropdown = () => {
-    setShowDropdown(prev => !prev);
+    setShowDropdown((prev) => !prev);
   };
 
   const handleDeleteChat = () => {
@@ -152,8 +167,8 @@ const Message = () => {
   };
 
   return (
-    <div style={{ backgroundImage: `url(${backgroundImage})`}} >
-      <header className="sticky top-0 h-16 bg-slate-900 flex justify-between items-center px-4 rounded-lg m-1">
+    <div style={{ backgroundImage: `url(${backgroundImage})` }}>
+      <header className="sticky top-0 h-16 bg-slate-900 flex justify-between items-center px-4 rounded-lg m-1 z-10">
         <div className="flex items-center gap-4">
           <Link to={"/"} className="lg:hidden flex items-center text-slate-500">
             <FaAngleLeft size={25} />
@@ -179,51 +194,71 @@ const Message = () => {
           </div>
         </div>
         <div className="relative">
-          <button onClick={toggleDropdown} 
-          className="cursor-pointer text-slate-500 hover:text-slate-300 flex items-center">
+          <button
+            onClick={toggleDropdown}
+            className="cursor-pointer text-slate-500 hover:text-slate-300 flex items-center"
+          >
             <HiDotsVertical size={25} />
           </button>
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-              <button
-                onClick={handleDeleteChat}
-                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <RiDeleteBin6Line className="mr-2" />
-                Delete Chat
-              </button>
-              <button
+            <div className="bg-slate-600 shadow rounded absolute top-10 right-0 w-40 p-2 my-2 x-">
+              <label
+                className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 rounded cursor-pointer"
                 onClick={handleBlockUser}
-                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                <ImBlocked className="mr-2" />
-                Block User
-              </button>
+                <div className="text-red-700">
+                  <ImBlocked />
+                </div>
+                <p>Block User</p>
+              </label>
+              <label
+                className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 rounded cursor-pointer"
+                onClick={handleDeleteChat}
+              >
+                <div className="text-purple-900">
+                  <RiDeleteBin6Line />
+                </div>
+                <p>Delete Chat</p>
+              </label>
             </div>
           )}
         </div>
       </header>
 
-      <section className="h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative">
-        
+      <section className="h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative z-0">
         {/**message display field */}
         <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
-          {
-            allMessage.map((msg, index) => (
-              <div className={`p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${user._id === msg?.msgByUserId ? "ml-auto bg-green-800" : "bg-gray-500"}`} key={index}>
-                <div className='w-full relative'>
-                  {msg?.imageURL && (
-                    <img src={msg?.imageURL} className='w-full h-full object-scale-down' alt="Uploaded" />
-                  )}
-                  {msg?.videoURL && (
-                    <video src={msg.videoURL} className='w-full h-full object-scale-down' controls />
-                  )}
-                </div>
-                <p className='px-2 font-sans'>{msg.text}</p>
-                <p className='text-xs ml-auto w-fit font-semibold'>{moment(msg.createdAt).format('hh:mm')}</p>
+          {allMessage.map((msg, index) => (
+            <div
+              className={`p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${
+                user._id === msg?.msgByUserId
+                  ? "ml-auto bg-green-800"
+                  : "bg-gray-500"
+              }`}
+              key={index}
+            >
+              <div className="w-full relative">
+                {msg?.imageURL && (
+                  <img
+                    src={msg?.imageURL}
+                    className="w-full h-full object-scale-down"
+                    alt="Uploaded"
+                  />
+                )}
+                {msg?.videoURL && (
+                  <video
+                    src={msg.videoURL}
+                    className="w-full h-full object-scale-down"
+                    controls
+                  />
+                )}
               </div>
-            ))
-          }
+              <p className="px-2 font-sans">{msg.text}</p>
+              <p className="text-xs ml-auto w-fit font-semibold">
+                {moment(msg.createdAt).format("hh:mm")}
+              </p>
+            </div>
+          ))}
         </div>
 
         {(message.imageURL || message.videoURL) && (
@@ -251,7 +286,7 @@ const Message = () => {
           </div>
         )}
       </section>
-
+            
       <section className="h-16 bg-slate-900 rounded-lg m-1 flex items-center px-2">
         <div className="relative">
           <div className="flex items-center justify-center">
