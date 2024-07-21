@@ -87,9 +87,8 @@ io.on('connection',async(socket)=>{
         
         const message = new MessageModel({
           text : data.text,
-          imageURL : data.imageURL,
-          videoURL : data.videoURL,
-          audioURL : data.audioURL,
+          imageUrl : data.imageUrl,
+          videoUrl : data.videoUrl,
           msgByUserId :  data?.msgByUserId,
         })
         const saveMessage = await message.save()
